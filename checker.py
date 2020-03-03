@@ -3,7 +3,7 @@ import glob
 
 import data
 
-SHAPE = (40, 40)
+SHAPE = (90, 70, 3)
 
 
 def main():
@@ -14,14 +14,18 @@ def main():
 
 
 def check_images():
-    """Check that the images are the right size"""
+    """Check that the images are within the size range for x and y"""
     for image_name in glob.glob("images/*.png"):
         image = cv2.imread(image_name)
-        if image.shape != SHAPE:
+        if image.shape[0] > SHAPE[0] or image.shape[1] > SHAPE[1]:
             raise ValueError(
-                "Image {} doesn't match desired shape {}".format(
-                    image_name, SHAPE
+                "Image {} too big: {} > {}".format(
+                    image_name, image.shape, SHAPE
                 )
+            )
+        if image.shape[2] != 3:
+            raise ValueError(
+                "Image {} is not in color image format".format(image_name)
             )
 
 
