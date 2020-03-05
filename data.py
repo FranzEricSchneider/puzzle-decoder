@@ -17,9 +17,7 @@ ASSUMED = {
     44: ".",
 }
 
-# TODO: Change the first letter of the second word in the repeated line before : 98
-# TODO: Change the first letter in the line below 5:
-# TODO: Change the third letter two lines below 9:
+
 CHARACTERS = (
     # Title
     1, 12, 4, 40,
@@ -110,7 +108,7 @@ CHARACTERS = (
     7, 14, 1, 21, 40,
     8, 11, 43,
 
-    1, 16, 18, 4, 10, 14, 8, 16, 43,
+    2, 16, 18, 4, 10, 14, 8, 16, 43,
 
     # Repeated
     16, 19, 7, 7, 4, 16, 16, 40,
@@ -191,7 +189,7 @@ CHARACTERS = (
     9, 19, 10, 4, 9, 16, 40,
     8, 11, 43,
 
-    11, 2, 16, 9, 12, 2, 29, 4, 5, 43,
+    11, 2, 14, 9, 12, 2, 29, 4, 5, 43,
 
     # Repeated
     16, 19, 7, 7, 4, 16, 16, 40,
