@@ -44,9 +44,10 @@ def check_character_number():
     unknown_set = complete_set - known_set
     # We need 26 or fewer unknowns
     assert len(unknown_set) <= 26
+    assert unknown_set == data.UNKNOWN
 
 
-def check_characters_with_image():
+def check_characters_with_image(mapping=None):
     """TODO: Explain."""
 
     # Note that in image space it goes (y, x), a.k.a. (vertical, horizontal)
@@ -82,12 +83,16 @@ def check_characters_with_image():
             if character in data.ASSUMED:
                 text = data.ASSUMED[character]
             else:
-                text = "?"
+                if mapping:
+                    text = mapping[character]
+                else:
+                    text = "?"
             cv2.putText(
                 img=image,
                 text=text,
                 # WTF - why is putText location now in (horizontal, vertical)?
-                org=(cursor.x, cursor.ymax + TEXT_BUFFER),
+                org=(cursor.x + character_image.shape[1] // 4,
+                     cursor.ymax + TEXT_BUFFER),
                 fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1.5,
                 color=(0, 0, 0),

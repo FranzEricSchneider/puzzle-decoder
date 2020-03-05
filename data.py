@@ -17,6 +17,9 @@ ASSUMED = {
     44: ".",
 }
 
+# TODO: Change the first letter of the second word in the repeated line before : 98
+# TODO: Change the first letter in the line below 5:
+# TODO: Change the third letter two lines below 9:
 CHARACTERS = (
     # Title
     1, 12, 4, 40,
@@ -208,3 +211,8 @@ CHARACTERS = (
     12, 19, 3, 2, 5, 14, 1, 21, 40,
     15, 4, 13, 14, 5, 44,
 )
+
+
+# TODO: Test all of these
+UNKNOWN = set(CHARACTERS) - set(ASSUMED.keys())
+WORDS = []
