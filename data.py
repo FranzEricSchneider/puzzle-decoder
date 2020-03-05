@@ -122,3 +122,8 @@ CHARACTERS = (
     20, 9, 8, 15, 2, 15, 14, 10, 14, 1, 21, 41, 40,
     22, 23, 43,
 )
+
+
+# TODO: Test all of these
+UNKNOWN = set(CHARACTERS) - set(ASSUMED.keys())
+WORDS = []
