@@ -16,6 +16,9 @@ ASSUMED = {
     43: "\n",
 }
 
+# TODO: Change the first letter of the second word in the repeated line before : 98
+# TODO: Change the first letter in the line below 5:
+# TODO: Change the third letter two lines below 9:
 CHARACTERS = (
     1, 12, 4, 40,
     14, 5, 29, 2, 16, 14, 8, 5, 40,
