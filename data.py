@@ -1,3 +1,6 @@
+import collections
+
+
 ASSUMED = {
     22: "9",
     23: "4",
@@ -210,7 +213,30 @@ CHARACTERS = (
     15, 4, 13, 14, 5, 44,
 )
 
-
-# TODO: Test all of these
+# Set of unknown characters
 UNKNOWN = set(CHARACTERS) - set(ASSUMED.keys())
-WORDS = []
+
+# Tuple of all words
+_words = []
+_word = []
+for _character in CHARACTERS:
+    if _character in ASSUMED:
+        if _word:
+            _words.append(tuple(_word))
+            _word = []
+    else:
+        _word.append(_character)
+WORDS = tuple(_words)
+# Counter object of all characters and words
+CHARACTER_FREQ = collections.Counter([character for character in CHARACTERS
+                                      if character not in ASSUMED])
+WORD_FREQ = collections.Counter(WORDS)
+
+# Set of unique words
+WORD_SET = set(WORDS)
+# Counter object of characters in the word set (to avoid influence by repeated
+# phrases)
+_word_set_characters = []
+for _word in WORD_SET:
+    _word_set_characters.extend(list(_word))
+SET_FREQ = collections.Counter(_word_set_characters)

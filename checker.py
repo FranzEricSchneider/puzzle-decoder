@@ -1,4 +1,4 @@
-from collections import namedtuple
+import collections
 import cv2
 import glob
 import numpy
@@ -15,12 +15,13 @@ TEXT_BUFFER = 40
 # The height to allow for each row of character + text
 LINE_BUFFER = TEXT_BUFFER + 10
 # Tracks the current spot where we are inserting characters
-Cursor = namedtuple('Cursor', ['x', 'ymin', 'ymax'])
+Cursor = collections.namedtuple('Cursor', ['x', 'ymin', 'ymax'])
 
 
 def main():
     check_images()
     check_character_number()
+    check_words()
     check_characters_with_image()
 
 
@@ -49,6 +50,39 @@ def check_character_number():
     assert len(unknown_set) <= 26
     # Assert that data.UNKNOWN was constructed the same way
     assert unknown_set == data.UNKNOWN
+
+
+def check_words():
+    # Check basic types
+    assert isinstance(data.WORDS, tuple)
+    for word in data.WORDS:
+        assert isinstance(word, tuple)
+        for character in word:
+            assert isinstance(character, int)
+
+    # Give some basic length and value constraints
+    assert len(data.WORDS) > 100
+    for word in data.WORDS:
+        assert len(word) >= 1
+        for character in word:
+            assert character < 40
+            assert character not in data.ASSUMED
+
+    # Check some basic properties of the set
+    assert isinstance(data.WORD_SET, set)
+    for word in data.WORD_SET:
+        assert isinstance(word, tuple)
+        assert word in data.WORDS
+    for word in data.WORDS:
+        assert word in data.WORD_SET
+
+    # Check the frequency dictionaries
+    for freq in [data.CHARACTER_FREQ, data.SET_FREQ]:
+        assert isinstance(freq, collections.Counter)
+        for character in freq:
+            assert character not in data.ASSUMED
+            assert character in data.CHARACTERS
+    assert sum(data.CHARACTER_FREQ.values()) > sum(data.SET_FREQ.values())
 
 
 def check_characters_with_image(mapping=None):
