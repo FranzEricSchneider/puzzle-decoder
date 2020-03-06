@@ -183,7 +183,8 @@ def check_key(checked_keys, words, key):
             pass
     score = count / len(words)
 
-    # Record the checked key and its score
-    checked_keys[key] = score
+    # Record the checked key and its score. Note that we have to set the keys
+    # to be strings so we can jsonify them
+    checked_keys[str(key)] = score
 
     return mapped, score

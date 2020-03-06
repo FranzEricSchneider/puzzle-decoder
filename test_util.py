@@ -2,6 +2,7 @@
 
 import collections
 import glob
+import json
 
 import cv2
 import numpy
@@ -81,8 +82,9 @@ def test_check_key():
     assert isinstance(score, float)
     assert numpy.isclose(score, 1.0)
     assert checked_keys == {
-        ((33, "t"), (21, "h"), (4, "u"), (8, "d")): 1.0,
+        str(((33, "t"), (21, "h"), (4, "u"), (8, "d"))): 1.0,
     }
+    json.dumps(checked_keys)
 
     # monstrous regiment
     words = ((33, 21, 4, 8, 15, 30, 21, 19, 8), (30, 2, 6, 13, 33, 2, 4, 15))
@@ -94,10 +96,11 @@ def test_check_key():
                       ("r", "e", "g", "i", "m", "e", "n", "t"))
     assert numpy.isclose(score, 1.0)
     assert checked_keys == {
-        ((33, "t"), (21, "h"), (4, "u"), (8, "d")): 1.0,
-        ((33, "m"), (21, "o"), (4, "n"), (8, "s"), (15, "t"),
-         (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i")): 1.0,
+        str(((33, "t"), (21, "h"), (4, "u"), (8, "d"))): 1.0,
+        str(((33, "m"), (21, "o"), (4, "n"), (8, "s"), (15, "t"),
+             (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i"))): 1.0,
     }
+    json.dumps(checked_keys)
 
     # Same words, but taking out "o"
     key = ((33, "m"), (4, "n"), (8, "s"), (15, "t"),
@@ -108,12 +111,13 @@ def test_check_key():
                       ("r", "e", "g", "i", "m", "e", "n", "t"))
     assert numpy.isclose(score, 0.5)
     assert checked_keys == {
-        ((33, "t"), (21, "h"), (4, "u"), (8, "d")): 1.0,
-        ((33, "m"), (21, "o"), (4, "n"), (8, "s"), (15, "t"),
-         (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i")): 1.0,
-        ((33, "m"), (4, "n"), (8, "s"), (15, "t"),
-         (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i")): 0.5,
+        str(((33, "t"), (21, "h"), (4, "u"), (8, "d"))): 1.0,
+        str(((33, "m"), (21, "o"), (4, "n"), (8, "s"), (15, "t"),
+             (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i"))): 1.0,
+        str(((33, "m"), (4, "n"), (8, "s"), (15, "t"),
+             (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i"))): 0.5,
     }
+    json.dumps(checked_keys)
 
     # Same words, but taking out "t"
     # Also, wipe the checked_keys and assert it's not persistent
@@ -126,9 +130,10 @@ def test_check_key():
                       ("r", "e", "g", "i", "m", "e", "n", 15))
     assert numpy.isclose(score, 0.0)
     assert checked_keys == {
-        ((33, "m"), (21, "o"), (4, "n"), (8, "s"),
-         (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i")): 0.0,
+        str(((33, "m"), (21, "o"), (4, "n"), (8, "s"),
+             (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i"))): 0.0,
     }
+    json.dumps(checked_keys)
 
 
 if __name__ == '__main__':
