@@ -128,9 +128,36 @@ def sample_exponential():
                 yield value
 
 
-def map_characters(words, key):
+def map_characters(characters, key):
     """
-    Takes a tuple of tuple and returns the same, but with swapped values,
+    Takes a tuple of characters and returns the same, but with swapped values,
+    according to the given mapping AND to the assumed mapping in data.ASSUMED
+    using whitespace, punctuation, and numbers
+
+    Arguments:
+        characters: tuple of ciphertext characters (integers)
+        key: tuple of tuple pairs containing (cipher character, ascii). Does
+            not need to map all 26 letters
+
+    Returns:
+        same structure as characters, but some or all of the cipher characters
+        have been swapped for the ascii characters via key and data.ASSUMED
+    """
+    mapping = dict(key)
+    new_characters = []
+    for character in characters:
+        if character in data.ASSUMED:
+            new_characters.append(data.ASSUMED[character])
+        elif character in mapping:
+            new_characters.append(mapping[character])
+        else:
+            new_characters.append(character)
+    return tuple(new_characters)
+
+
+def map_words(words, key):
+    """
+    Takes a tuple of tuples and returns the same, but with swapped values,
     according to the given mapping
 
     Arguments:
@@ -159,18 +186,18 @@ def check_key(checked_keys, words, key):
 
     Arguments:
         checked_keys: dict, contains {tuple key: float score}
-        words: see map_characters
-        key: see map_characters
+        words: see map_words
+        key: see map_words
 
     Returns:
-        mapped: see map_characters return value
+        mapped: see map_words return value
         score: float
 
     Note that the dictionary checked_keys is modified
     """
 
     # Switch characters we know we want to map
-    mapped = map_characters(words, key)
+    mapped = map_words(words, key)
 
     # Calculate the score by the number of English words
     count = 0
@@ -188,3 +215,25 @@ def check_key(checked_keys, words, key):
     checked_keys[str(key)] = score
 
     return mapped, score
+
+
+def display_key(key, include_characters=False):
+    """Render a key onto the whole dataset."""
+    mapped = list(map_characters(data.CHARACTERS, key))
+    for idx in range(len(mapped)):
+        if not isinstance(mapped[idx], str):
+            removed = mapped.pop(idx)
+            if include_characters:
+                mapped.insert(idx, ".{}.".format(removed))
+            else:
+                mapped.insert(idx, "?")
+
+    # Do some visual formatting in the include_characters case
+    joined = "".join(mapped)
+    if include_characters:
+        joined = joined.replace("..", ".")
+        joined = joined.replace(" .", " ")
+        joined = joined.replace(". ", " ")
+        joined = joined.replace(" ", "   ")
+
+    return "{}\n".format(key) + joined

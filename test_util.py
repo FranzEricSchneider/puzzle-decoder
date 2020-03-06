@@ -18,7 +18,8 @@ def main():
     test_images()
     # test_exponential()
     test_check_key()
-    test_map_characters()
+    test_map_words()
+    test_display_key()
 
 
 def test_images():
@@ -58,14 +59,24 @@ def test_exponential():
 
 
 def test_map_characters():
+    # 40, 41, and 42 have assumed values
+    characters = (1, 2, 3, 4, 22, 40, 41, 42)
+    # Note that the key cannot map over ASSUMED characters
+    assert util.map_words(
+        characters=characters,
+        key=((3, "a"), (4, "b"), (41, "c"))
+    ) == (1, 2, "a", "b", "9", " ", ":", ",")
+
+
+def test_map_words():
     words = ((1, 2, 3), (4, 5), (1, 2, 5, 6, 7, 8, 9, 10))
 
-    assert util.map_characters(
+    assert util.map_words(
         words=words,
         key=((3, "a"), (4, "b"), (8, "c"))
     ) == ((1, 2, "a"), ("b", 5), (1, 2, 5, 6, 7, "c", 9, 10))
 
-    assert util.map_characters(
+    assert util.map_words(
         words=words,
         key=((1, "y"), (5, "z"))
     ) == (("y", 2, 3), (4, "z"), ("y", 2, "z", 6, 7, 8, 9, 10))
@@ -134,6 +145,12 @@ def test_check_key():
              (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i"))): 0.0,
     }
     json.dumps(checked_keys)
+
+
+def test_display_key():
+    print(util.display_key(data.SAMPLE_KEY, include_characters=True))
+    print("\n==================\n")
+    print(util.display_key(data.SAMPLE_KEY, include_characters=False))
 
 
 if __name__ == '__main__':
