@@ -1,14 +1,25 @@
+#!/usr/bin/python3
+
 import collections
 
 import data
 
 
 def main():
-    check_character_number()
-    check_words()
+    test_english()
+    test_character_number()
+    test_words()
 
 
-def check_character_number():
+def test_english():
+    for word in ["she", "strode", "defiantly", "into", "the", "sky"]:
+        assert data.is_english(word)
+
+    for not_word in ["esmerylda", "waz", "mohst", "upzet", "whith", "nanogg"]:
+        assert not data.is_english(not_word)
+
+
+def test_character_number():
     """Assert that our unknown characters can be explained by the alphabet."""
     complete_set = set(data.CHARACTERS)
     known_set = set(data.ASSUMED.keys())
@@ -19,7 +30,7 @@ def check_character_number():
     assert unknown_set == data.UNKNOWN
 
 
-def check_words():
+def test_words():
     # Check basic types
     assert isinstance(data.WORDS, tuple)
     for word in data.WORDS:

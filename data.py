@@ -1,4 +1,15 @@
+#!/usr/bin/python3
+
 import collections
+
+
+# https://github.com/dwyl/english-words
+with open("/home/eric/projects/english-words    /words.txt") as word_file:
+    _english = set(word.strip().lower() for word in word_file)
+
+
+def is_english(word):
+    return word.lower() in _english
 
 
 ASSUMED = {
