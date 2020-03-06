@@ -1,10 +1,31 @@
 import collections
+import cv2
+import glob
 
+import data
 import util
 
 
 def main():
+    util.check_characters_with_image(data.CHARACTERS, data.ASSUMED)
+    test_images()
     test_exponential()
+
+
+def test_images():
+    """Check that the images are within the size range."""
+    for image_name in glob.glob("images/*.png"):
+        image = cv2.imread(image_name)
+        if image.shape[0] > util.SHAPE[0] or image.shape[1] > util.SHAPE[1]:
+            raise ValueError(
+                "Image {} too big: {} > {}".format(
+                    image_name, image.shape, util.SHAPE
+                )
+            )
+        if image.shape[2] != 3:
+            raise ValueError(
+                "Image {} is not in color image format".format(image_name)
+            )
 
 
 def test_exponential():
