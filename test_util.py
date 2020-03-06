@@ -1,17 +1,23 @@
 #!/usr/bin/python3
 
 import collections
-import cv2
 import glob
+
+import cv2
+import numpy
 
 import data
 import util
 
 
 def main():
-    util.check_characters_with_image(data.CHARACTERS, data.ASSUMED)
+    util.check_characters_with_image(data.CHARACTERS,
+                                     data.ASSUMED,
+                                     mapping=dict(data.SAMPLE_KEY))
     test_images()
-    test_exponential()
+    # test_exponential()
+    test_check_key()
+    test_map_characters()
 
 
 def test_images():
@@ -48,6 +54,81 @@ def test_exponential():
         del counted[key]
         for lesser_count in counted.values():
             assert count > lesser_count
+
+
+def test_map_characters():
+    words = ((1, 2, 3), (4, 5), (1, 2, 5, 6, 7, 8, 9, 10))
+
+    assert util.map_characters(
+        words=words,
+        key=((3, "a"), (4, "b"), (8, "c"))
+    ) == ((1, 2, "a"), ("b", 5), (1, 2, 5, 6, 7, "c", 9, 10))
+
+    assert util.map_characters(
+        words=words,
+        key=((1, "y"), (5, "z"))
+    ) == (("y", 2, 3), (4, "z"), ("y", 2, "z", 6, 7, 8, 9, 10))
+
+
+def test_check_key():
+    # thud
+    checked_keys = {}
+    words = ((33, 21, 4, 8), )
+    key = ((33, "t"), (21, "h"), (4, "u"), (8, "d"))
+    mapped, score = util.check_key(checked_keys, words, key)
+
+    assert mapped == (("t", "h", "u", "d"), )
+    assert isinstance(score, float)
+    assert numpy.isclose(score, 1.0)
+    assert checked_keys == {
+        ((33, "t"), (21, "h"), (4, "u"), (8, "d")): 1.0,
+    }
+
+    # monstrous regiment
+    words = ((33, 21, 4, 8, 15, 30, 21, 19, 8), (30, 2, 6, 13, 33, 2, 4, 15))
+    key = ((33, "m"), (21, "o"), (4, "n"), (8, "s"), (15, "t"),
+           (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i"))
+    mapped, score = util.check_key(checked_keys, words, key)
+
+    assert mapped == (("m", "o", "n", "s", "t", "r", "o", "u", "s"),
+                      ("r", "e", "g", "i", "m", "e", "n", "t"))
+    assert numpy.isclose(score, 1.0)
+    assert checked_keys == {
+        ((33, "t"), (21, "h"), (4, "u"), (8, "d")): 1.0,
+        ((33, "m"), (21, "o"), (4, "n"), (8, "s"), (15, "t"),
+         (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i")): 1.0,
+    }
+
+    # Same words, but taking out "o"
+    key = ((33, "m"), (4, "n"), (8, "s"), (15, "t"),
+           (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i"))
+    mapped, score = util.check_key(checked_keys, words, key)
+
+    assert mapped == (("m", 21, "n", "s", "t", "r", 21, "u", "s"),
+                      ("r", "e", "g", "i", "m", "e", "n", "t"))
+    assert numpy.isclose(score, 0.5)
+    assert checked_keys == {
+        ((33, "t"), (21, "h"), (4, "u"), (8, "d")): 1.0,
+        ((33, "m"), (21, "o"), (4, "n"), (8, "s"), (15, "t"),
+         (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i")): 1.0,
+        ((33, "m"), (4, "n"), (8, "s"), (15, "t"),
+         (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i")): 0.5,
+    }
+
+    # Same words, but taking out "t"
+    # Also, wipe the checked_keys and assert it's not persistent
+    checked_keys = {}
+    key = ((33, "m"), (21, "o"), (4, "n"), (8, "s"),
+           (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i"))
+    mapped, score = util.check_key(checked_keys, words, key)
+
+    assert mapped == (("m", "o", "n", "s", 15, "r", "o", "u", "s"),
+                      ("r", "e", "g", "i", "m", "e", "n", 15))
+    assert numpy.isclose(score, 0.0)
+    assert checked_keys == {
+        ((33, "m"), (21, "o"), (4, "n"), (8, "s"),
+         (30, "r"), (19, "u"), (2, "e"), (6, "g"), (13, "i")): 0.0,
+    }
 
 
 if __name__ == '__main__':

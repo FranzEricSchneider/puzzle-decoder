@@ -4,6 +4,8 @@ import collections
 import cv2
 import numpy
 
+import data
+
 
 # The maximum size each individual character can be
 SHAPE = (90, 70, 3)
@@ -73,7 +75,7 @@ def check_characters_with_image(characters, assumed, mapping=None):
             if character in assumed:
                 text = assumed[character]
             else:
-                if mapping:
+                if mapping and character in mapping:
                     text = mapping[character]
                 else:
                     text = "?"
@@ -124,3 +126,64 @@ def sample_exponential():
         for value in batch:
             if value <= 1.0:
                 yield value
+
+
+def map_characters(words, key):
+    """
+    Takes a tuple of tuple and returns the same, but with swapped values,
+    according to the given mapping
+
+    Arguments:
+        words: tuple of tuple of ciphertext characters (integers)
+        key: tuple of tuple pairs containing (cipher character, ascii). Does
+            not need to map all 26 letters
+
+    Returns:
+        same structure as words, but some or all of the cipher characters have
+        been swapped for the ascii characters via key
+    """
+    mapping = dict(key)
+    new_words = []
+    for word in words:
+        new_words.append(
+            tuple([mapping[character] if character in mapping else character
+                   for character in word])
+        )
+    return tuple(new_words)
+
+
+def check_key(checked_keys, words, key):
+    """
+    Scores a given key by ranking the fraction of English in words created
+    by the key, then stores that mapping in checked_keys.
+
+    Arguments:
+        checked_keys: dict, contains {tuple key: float score}
+        words: see map_characters
+        key: see map_characters
+
+    Returns:
+        mapped: see map_characters return value
+        score: float
+
+    Note that the dictionary checked_keys is modified
+    """
+
+    # Switch characters we know we want to map
+    mapped = map_characters(words, key)
+
+    # Calculate the score by the number of English words
+    count = 0
+    for word in mapped:
+        try:
+            string_word = "".join(word)
+            if data.is_english(string_word):
+                count += 1
+        except TypeError:
+            pass
+    score = count / len(words)
+
+    # Record the checked key and its score
+    checked_keys[key] = score
+
+    return mapped, score
