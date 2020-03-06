@@ -1,3 +1,2 @@
 # ignore compiled python files
 *.pyc
-checked_keys_dictionary.json
