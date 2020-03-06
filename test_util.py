@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import collections
 import cv2
 import glob

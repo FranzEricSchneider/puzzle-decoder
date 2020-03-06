@@ -3,8 +3,7 @@
 import collections
 
 
-# https://github.com/dwyl/english-words
-with open("/home/eric/projects/english-words    /words.txt") as word_file:
+with open("/usr/share/dict/words") as word_file:
     _english = set(word.strip().lower() for word in word_file)
 
 
@@ -29,6 +28,12 @@ ASSUMED = {
     42: ",",
     43: "\n",
     44: ".",
+}
+
+
+GUESSES = {
+    # This is the only one ever found as a single character
+    2: ("a", "i"),
 }
 
 
