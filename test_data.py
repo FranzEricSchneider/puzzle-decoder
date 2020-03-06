@@ -9,6 +9,7 @@ def main():
     test_english()
     test_character_number()
     test_words()
+    test_keys()
 
 
 def test_english():
@@ -61,6 +62,13 @@ def test_words():
             assert character not in data.ASSUMED
             assert character in data.CHARACTERS
     assert sum(data.CHARACTER_FREQ.values()) > sum(data.SET_FREQ.values())
+
+
+def test_keys():
+    mapping = dict(data.SAMPLE_KEY)
+    assert len(mapping) == 6
+    assert 2 in mapping
+
 
 
 if __name__ == '__main__':

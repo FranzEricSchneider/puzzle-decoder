@@ -256,3 +256,11 @@ _word_set_characters = []
 for _word in WORD_SET:
     _word_set_characters.extend(list(_word))
 SET_FREQ = collections.Counter(_word_set_characters)
+
+
+# Example of how keys look (could be up to 26 pairs long)
+SAMPLE_KEY = ((2, "a"), (1, "t"), (12, "h"), (4, "e"), (8, "i"), (11, "s"))
+
+
+if __name__ == '__main__':
+    import ipdb; ipdb.set_trace()
