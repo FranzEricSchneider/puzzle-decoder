@@ -63,6 +63,14 @@ def test_words():
             assert character in data.CHARACTERS
     assert sum(data.CHARACTER_FREQ.values()) > sum(data.SET_FREQ.values())
 
+    # Assert that the frequency lists are sorted so that the largest frequency
+    # items come first
+    for freq, freq_list in [(data.CHARACTER_FREQ, data.CHARACTER_FREQ_LIST),
+                            (data.SET_FREQ, data.SET_FREQ_LIST)]:
+        for i in range(len(freq_list) - 1):
+            assert freq[freq_list[i]] >= freq[freq_list[i + 1]]
+    # Check the sorted dictionary list
+
 
 def test_keys():
     mapping = dict(data.SAMPLE_KEY)

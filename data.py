@@ -258,6 +258,23 @@ for _word in WORD_SET:
 SET_FREQ = collections.Counter(_word_set_characters)
 
 
+# English letters sorted, from here:
+# http://pi.math.cornell.edu/~mec/2003-2004/cryptography/subs/frequencies.html
+ENGLISH_FREQ_LIST = ("e", "t", "a", "o", "i", "n", "s", "r", "h", "d", "l",
+                     "u", "c", "m", "f", "y", "w", "g", "p", "b", "v", "k",
+                     "x", "q", "j", "z")
+# Get the two lists of frequency-sorts cipher characters (different assumptions
+# on their base data)
+CHARACTER_FREQ_LIST = [
+    key for key, value in
+    sorted(CHARACTER_FREQ.items(), key=lambda x: x[1], reverse=True)
+]
+SET_FREQ_LIST = [
+    key for key, value in
+    sorted(SET_FREQ.items(), key=lambda x: x[1], reverse=True)
+]
+
+
 # Example of how keys look (could be up to 26 pairs long)
 SAMPLE_KEY = ((2, "a"), (1, "t"), (12, "h"), (4, "e"), (8, "i"), (11, "s"))
 
