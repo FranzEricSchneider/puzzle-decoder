@@ -19,7 +19,8 @@ def main():
     # test_exponential()
     test_check_key()
     test_map_words()
-    test_display_key()
+    # test_display_key()
+    test_get_ranked_keys()
 
 
 def test_images():
@@ -151,6 +152,24 @@ def test_display_key():
     print(util.display_key(data.SAMPLE_KEY, include_characters=True))
     print("\n==================\n")
     print(util.display_key(data.SAMPLE_KEY, include_characters=False))
+
+
+def test_get_ranked_keys():
+    checked_keys = {
+        ((3, "a"), (6, "z")): 0.15,
+        ((2, "a"), (4, "z")): 0.5,
+        ((1, "a"), (5, "z")): 0.75,
+        ((4, "a"), (9, "z")): 0.0,
+    }
+    ranked_keys, scores = util.get_ranked_keys(checked_keys)
+    assert ranked_keys == [((1, "a"), (5, "z"))]
+    assert scores == [0.75]
+
+    ranked_keys, scores = util.get_ranked_keys(checked_keys, number=3)
+    assert ranked_keys == [((1, "a"), (5, "z")),
+                           ((2, "a"), (4, "z")),
+                           ((3, "a"), (6, "z"))]
+    assert scores == [0.75, 0.5, 0.15]
 
 
 if __name__ == '__main__':

@@ -232,8 +232,38 @@ def display_key(key, include_characters=False):
     joined = "".join(mapped)
     if include_characters:
         joined = joined.replace("..", ".")
-        joined = joined.replace(" .", " ")
-        joined = joined.replace(". ", " ")
+        joined = joined.replace(" .", " ").replace(". ", " ")
         joined = joined.replace(" ", "   ")
 
     return "{}\n".format(key) + joined
+
+
+RankedKey = collections.namedtuple('RankedKey', ['key', 'score'])
+
+
+def get_ranked_keys(checked_keys, number=1):
+    """
+    Get the top N ranked keys from a dictionary.
+
+    Arguments:
+        checked_keys: a dictionary of keys and scores, as from
+            checked_keys_dictionary.json
+        number: number of ranked scores we want to extract
+
+    Returns:
+        A tuple of (list of ranked keys, list of corresponding scores)
+    """
+    assert number >= 1
+    ranked_keys = [RankedKey(key=None, score=0.0)] * number
+
+    for key, score in checked_keys.items():
+        # If the current score is greater than the least score in the ranked
+        # list, then replace that least score and then resort the list.
+        if score > ranked_keys[-1].score:
+            ranked_keys[-1] = RankedKey(key, score)
+            ranked_keys = sorted(ranked_keys,
+                                 key=lambda x: x.score,
+                                 reverse=True)
+
+    return ([key.key for key in ranked_keys],
+            [key.score for key in ranked_keys])
