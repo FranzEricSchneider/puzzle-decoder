@@ -267,3 +267,57 @@ def get_ranked_keys(checked_keys, number=1):
 
     return ([key.key for key in ranked_keys],
             [key.score for key in ranked_keys])
+
+
+def generate_random_key(RNG, checked_keys, length):
+    """
+    Create a random key, sampled from likely letters, of given length.
+
+    Arguments:
+        RNG: TODO
+        checked_keys: a dictionary of keys and scores, as from
+            checked_keys_dictionary.json
+        length: int, length of key to create
+
+    Returns:
+        A key of the normal format, a tuple of tuple pairs containing
+            (cipher character, ascii letter)
+    """
+    key = []
+
+    # Make a list of the frequency analyzed letters (cipher and ascii) so that
+    # elements can be popped
+    sample_characters = list(data.SET_FREQ_LIST)
+    sample_letters = list(data.ENGLISH_FREQ_LIST)
+
+    # Critically (maybe), for each key we want to map the *first* character
+    # with a sampled letter.
+    # Con: That means for a key of length 10 we will always map the same 10
+    #   characters. Maybe we should sample randomly from both lists?
+    # Pro: As-is, the characters will always be in a repeatable order. That
+    #   means that we don't have to deal with key uniqueness issues.
+    # Note: We *definitely* don't want to pop the same index from each list,
+    #   (that would always be the same mapping but with differently ordered
+    #   pairs) but we could take two samples
+    for _, sample in zip(range(length), RNG):
+        index = int(round(sample * len(sample_letters))) - 1
+        key.append(
+            (
+                sample_characters.pop(0),
+                sample_letters.pop(index)
+            )
+        )
+        # Cut it short if we claimed the last character or letter
+        if len(sample_characters) == 0 or len(sample_letters) == 0:
+            break
+
+    # Tuplify it to lock it in place and make it dictionaryable
+    key = tuple(key)
+
+    # If we have a collision, recurse and keep trying. Note that this also
+    # provides a natural limit to the number of attempts, since there is a
+    # recursion limit
+    while str(key) in checked_keys:
+        key = generate_random_key(RNG, checked_keys, length)
+
+    return key

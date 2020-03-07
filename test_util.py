@@ -21,6 +21,7 @@ def main():
     test_map_words()
     # test_display_key()
     test_get_ranked_keys()
+    test_generate_random_key()
 
 
 def test_images():
@@ -155,21 +156,55 @@ def test_display_key():
 
 
 def test_get_ranked_keys():
+    # Pretty simple, make sure we get a sorted list of the right length
+    # Note that we want to call str() on a tuple (instead of writing a string)
+    # because it will stringify things in the pythonic way (such as using ''
+    # for internal strings) which I messed up once
     checked_keys = {
-        ((3, "a"), (6, "z")): 0.15,
-        ((2, "a"), (4, "z")): 0.5,
-        ((1, "a"), (5, "z")): 0.75,
-        ((4, "a"), (9, "z")): 0.0,
+        str(((3, 'a'), (6, 'z'))): 0.15,
+        str(((2, 'a'), (4, 'z'))): 0.5,
+        str(((1, 'a'), (5, 'z'))): 0.75,
+        str(((4, 'a'), (9, 'z'))): 0.0,
     }
     ranked_keys, scores = util.get_ranked_keys(checked_keys)
-    assert ranked_keys == [((1, "a"), (5, "z"))]
+    assert ranked_keys == [str(((1, 'a'), (5, 'z')))]
     assert scores == [0.75]
 
     ranked_keys, scores = util.get_ranked_keys(checked_keys, number=3)
-    assert ranked_keys == [((1, "a"), (5, "z")),
-                           ((2, "a"), (4, "z")),
-                           ((3, "a"), (6, "z"))]
+    assert ranked_keys == [str(((1, 'a'), (5, 'z'))),
+                           str(((2, 'a'), (4, 'z'))),
+                           str(((3, 'a'), (6, 'z')))]
     assert scores == [0.75, 0.5, 0.15]
+
+
+def test_generate_random_key():
+    RNG = util.sample_exponential()
+
+    # Test that we get keys of the right length
+    for length in range(5, 15):
+        key = util.generate_random_key(RNG, {}, length)
+        assert len(key) == length
+        for pair in key:
+            assert len(pair) == 2
+            assert len(pair[1]) == 1
+            assert isinstance(pair[0], int)
+            assert isinstance(pair[1], str)
+
+    # Assert that we (probably) have the most common letters
+    key = util.generate_random_key(RNG, {}, 15)
+    values = [pair[1] for pair in key]
+    assert "e" in values
+    assert "t" in values
+
+    # Make a really common key and make sure we don't hit it
+    checked_keys = {str(((4, 'e'), (16, 't'))): 0.5}
+    for _ in range(int(1e3)):
+        key = util.generate_random_key(RNG, checked_keys, 2)
+        assert key != ((4, 'e'), (16, 't'))
+
+    # Check a longer-than possible length
+    key = util.generate_random_key(RNG, {}, 30)
+    assert len(key) == len(data.UNKNOWN)
 
 
 if __name__ == '__main__':
