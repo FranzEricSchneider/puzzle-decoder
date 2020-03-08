@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from ast import literal_eval
 import collections
 import glob
 import json
@@ -21,6 +22,7 @@ def main():
     test_map_words()
     # test_display_key()
     # test_display_words()
+    test_get_word_pairs()
     test_get_ranked_keys()
     test_generate_random_key()
 
@@ -83,6 +85,9 @@ def test_map_words():
         words=words,
         key=((1, "y"), (5, "z"))
     ) == (("y", 2, 3), (4, "z"), ("y", 2, "z", 6, 7, 8, 9, 10))
+
+
+# TODO: Make test for score_key
 
 
 def test_check_key():
@@ -162,6 +167,14 @@ def test_display_words():
     print(util.get_english_words(data.SAMPLE_KEY))
 
 
+def test_get_word_pairs():
+    # (Chosen by hand) these pairs were part of full words
+    pairs = util.get_word_pairs(data.SAMPLE_KEY)
+    assert pairs == (
+        (2, "a"), (1, "t"), (12, "h"), (4, "e"), (8, "o"), (11, "f")
+    )
+
+
 def test_get_ranked_keys():
     # Pretty simple, make sure we get a sorted list of the right length
     # Note that we want to call str() on a tuple (instead of writing a string)
@@ -183,6 +196,15 @@ def test_get_ranked_keys():
                            ((3, 'a'), (6, 'z'))]
     assert scores == [0.75, 0.5, 0.15]
 
+    # Check that this also works with non-string keys (for dynamic key
+    # tracking). Do the same thing but we de-stringed keys
+    checked_keys = {literal_eval(k): v
+                    for k,v in checked_keys.items()}
+    ranked_keys, scores = util.get_ranked_keys(checked_keys, number=3)
+    assert ranked_keys == [((1, 'a'), (5, 'z')),
+                           ((2, 'a'), (4, 'z')),
+                           ((3, 'a'), (6, 'z'))]
+    assert scores == [0.75, 0.5, 0.15]
 
 def test_generate_random_key():
     RNG = util.sample_exponential()

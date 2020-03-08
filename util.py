@@ -180,6 +180,29 @@ def map_words(words, key):
     return tuple(new_words)
 
 
+def score_key(mapped, key):
+    """
+    Calculate the score by the number of English words.
+
+    Arguments:
+        words: see map_words output
+        key: see map_words
+
+    Returns:
+        float, number from 0-1 indicated how many of the mapped words were
+        English
+    """
+    count = 0
+    for word in mapped:
+        try:
+            string_word = "".join(word)
+            if data.is_english(string_word):
+                count += 1
+        except TypeError:
+            pass
+    return count / len(mapped)
+
+
 def check_key(checked_keys, words, key):
     """
     Scores a given key by ranking the fraction of English in words created
@@ -200,16 +223,8 @@ def check_key(checked_keys, words, key):
     # Switch characters we know we want to map
     mapped = map_words(words, key)
 
-    # Calculate the score by the number of English words
-    count = 0
-    for word in mapped:
-        try:
-            string_word = "".join(word)
-            if data.is_english(string_word):
-                count += 1
-        except TypeError:
-            pass
-    score = count / len(words)
+    # Get the score in a reliable way
+    score = score_key(mapped, key)
 
     # Record the checked key and its score. Note that we have to set the keys
     # to be strings so we can jsonify them
@@ -258,6 +273,19 @@ def get_english_words(key):
     return words
 
 
+def get_word_pairs(key):
+    """Return a list of cipher/ascii pairs that were part of full words."""
+    valid_letters = set()
+    for word in get_english_words(key):
+        for letter in word:
+            valid_letters.add(letter)
+    pairs = []
+    for pair in key:
+        if pair[1] in valid_letters:
+            pairs.append(pair)
+    return tuple(pairs)
+
+
 RankedKey = collections.namedtuple('RankedKey', ['key', 'score'])
 
 
@@ -285,8 +313,14 @@ def get_ranked_keys(checked_keys, number=1):
                                  key=lambda x: x.score,
                                  reverse=True)
 
-    return ([literal_eval(key.key) for key in ranked_keys],
-            [key.score for key in ranked_keys])
+    # We should work with string keys (for the JSON dump) and for non-string
+    # keys (like in a dynamic key tracking)
+    try:
+        return ([literal_eval(key.key) for key in ranked_keys],
+                [key.score for key in ranked_keys])
+    except ValueError:
+        return ([key.key for key in ranked_keys],
+                [key.score for key in ranked_keys])
 
 
 def generate_random_key(RNG, checked_keys, length, frozen=None):
@@ -364,5 +398,24 @@ def generate_random_key(RNG, checked_keys, length, frozen=None):
     return key
 
 
-def polish_known_key(key):
-    pass
+# def polish_known_key(words, key, n_depth=100, n_breadth=100):
+#     """
+#     TODO.
+
+#     Arguments:
+#         key: TODO
+#         n_depth: TODO
+#         n_breadth: TODO
+
+#     Returns: TODO
+#     """
+
+#     # Track the keys generated as part of this endeavor
+#     keys = { key: score_key(map_words(words, key), key) }
+
+#     for _ in range(n_depth):
+#         top_keys, _ = get_ranked_keys(keys, number=1)
+#         top_key = top_keys[0]
+#         mapped = map_words(words, top_key)
+#         frozen = get_word_pairs(top_key)
+#         for __ in range(n_breadth):
