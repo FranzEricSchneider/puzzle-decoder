@@ -4,6 +4,7 @@ from ast import literal_eval
 import collections
 import cv2
 import numpy
+import string
 
 import data
 
@@ -37,7 +38,7 @@ def check_characters_with_image(characters, assumed, mapping=None):
     # Note that in image space it goes (y, x), a.k.a. (vertical, horizontal)
 
     # First make a blank canvas to insert images into
-    image = numpy.ones((70 * (SHAPE[0] + LINE_BUFFER), 30 * SHAPE[1], 3)) * 255
+    image = numpy.ones((70 * (SHAPE[0] + LINE_BUFFER), 70 * SHAPE[1], 3)) * 255
     # Make a cursor tracking the next position to add a character
     cursor = Cursor(x=0, ymin=0, ymax=SHAPE[0])
 
@@ -251,10 +252,15 @@ def display_key(key, include_characters=False, score=None):
         joined = joined.replace(" .", " ").replace(". ", " ")
         joined = joined.replace(" ", "   ")
 
+    # Get a common ending
+    postfix = "Unexplained characters:\n{}\n{}\n".format(
+        unexplained_letters(key), key
+    ) + joined
+
     if score is None:
-        return "{}\n".format(key) + joined
+        return postfix
     else:
-        return "score: {:.4f}\n{}\n".format(score, key) + joined
+        return "score: {:.4f}\n".format(score) + postfix
 
 
 def get_english_words(key):
@@ -271,6 +277,15 @@ def get_english_words(key):
             pass
 
     return words
+
+
+def unexplained_letters(key):
+    included = [pair[1] for pair in key]
+    unexplained = set()
+    for letter in string.ascii_lowercase:
+        if letter not in included:
+            unexplained.add(letter)
+    return unexplained
 
 
 def get_word_pairs(key):
@@ -369,7 +384,9 @@ def generate_random_key(RNG, checked_keys, length, frozen=None):
     # Note: We *definitely* don't want to pop the same index from each list,
     #   (that would always be the same mapping but with differently ordered
     #   pairs) but we could take two samples
-    while len(key) < length:
+    while (len(key) < length and
+            len(sample_characters) > 0 and
+            len(sample_letters) > 0):
         sample = next(RNG)
         index = int(round(sample * len(sample_letters))) - 1
         key.append(
@@ -378,9 +395,6 @@ def generate_random_key(RNG, checked_keys, length, frozen=None):
                 sample_letters.pop(index)
             )
         )
-        # Cut it short if we claimed the last character or letter
-        if len(sample_characters) == 0 or len(sample_letters) == 0:
-            break
 
     # Sort it so the cipher characters are in frequency order (for key
     # comparability)
@@ -398,24 +412,41 @@ def generate_random_key(RNG, checked_keys, length, frozen=None):
     return key
 
 
-# def polish_known_key(words, key, n_depth=100, n_breadth=100):
-#     """
-#     TODO.
+def polish_known_key(RNG, checked_keys, words, key, n_depth=100,
+                     n_breadth=100):
+    """
+    Try permuting all of the pairs in key that are *not currently* part of an
+    English word. The intent is to ignore presumed good stuff and narrow in
+    on the unknown areas.
 
-#     Arguments:
-#         key: TODO
-#         n_depth: TODO
-#         n_breadth: TODO
+    Arguments:
+        RNG: See generate_random_key docstring
+        checked_keys: See check_key docstring. This is the master dictionary
+            tracking which keys have been seen and their score
+        words: See map_words docstring
+        key: See generate_random_key docstring, this would be the output
+        n_depth: int, number of times to take the latest best key
+        n_breadth: int, number of times to try on a given key before moving
+            onto the current highest ranked one
 
-#     Returns: TODO
-#     """
+    Returns: Nothing. All that happens is checked_keys is updated
+    """
 
-#     # Track the keys generated as part of this endeavor
-#     keys = { key: score_key(map_words(words, key), key) }
+    # Track the keys generated as part of this endeavor
+    keys = { key: score_key(map_words(words, key), key) }
 
-#     for _ in range(n_depth):
-#         top_keys, _ = get_ranked_keys(keys, number=1)
-#         top_key = top_keys[0]
-#         mapped = map_words(words, top_key)
-#         frozen = get_word_pairs(top_key)
-#         for __ in range(n_breadth):
+    # Spend a while trying variations on the given key
+    for _ in range(n_depth):
+        top_keys, _ = get_ranked_keys(keys, number=1)
+        frozen = get_word_pairs(top_keys[0])
+        for _ in range(n_breadth):
+            # Generate a new key with certain values frozen
+            new_key = generate_random_key(RNG,
+                                          checked_keys,
+                                          length=26,
+                                          frozen=frozen)
+            _, score = check_key(checked_keys, words, new_key)
+
+            # Maintain a local structure of tried keys so we can get the top
+            # keys from our search area instead of from the global pool
+            keys[str(new_key)] = score
