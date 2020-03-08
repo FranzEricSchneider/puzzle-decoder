@@ -3,16 +3,37 @@
 import collections
 
 
+# TODO: initiate shows up a lot. Investigate? Doom. Seeds
+# Best key so far:
+# ((4, "e"), (16, "s"), (2, "a"), (14, "i"), (1, "t"), (8, "o"), (5, "n"), (9, "d"), (10, "l"), (6, "z"), (7, "c"), (19, "h"), (12, "y"), (21, "r"), (15, "g"), (3, "u"), (13, "m"), (11, "x"), (20, "p"), (29, "w"), (17, "f"), (18, "b"), (33, "j"), (24, "v"))
+
+
 with open("/usr/share/dict/words") as word_file:
     _english = set(word.strip().lower() for word in word_file)
 
 
 # Words that are in the dictionary that I am removing from consideration
-# (Most of these are populated using the solver's --show-words-only arg)
+# (Most of these are populated using the solver --show-words-only arg)
 BLACKLIST = set([
     "th", "ob", "li", "pei", "rn", "cali", "ani", "au", "sn", "ts", "os", "rs",
-    "es", "nth", "o", "ti", "lind",
+    "es", "nth", "o", "ti", "lind", "mo", "zed", "mani", "sh", "sade", "ni",
+    "hg", "les", "ac", "zane", "ho", "ann", "si", "noe", "zr", "kate", "ur",
+    "tare", "tsars", "jain", "pate", "mads", "al", "saar", "fa", "che", "hes",
+    "em", "eco", "mi", "hob", "ben", "ci", "len","ra", "jon", "mira", "ned",
+    "md", "mg", "leo", "oz", "fain", "ah",  "laue", "wot", "fay", "roy", "mu",
+    "nu", "fez", "np", "sol", "rho", "pd", "ag", "mel", "gad", "ito", "la",
+    "lam", "loth", "tads", "hz", "ref", "cain", "di", "ibo", "sb", "ay", "fer",
+    "rio", "ado", "nd", "ed", "di", "yo", "ty", "eh", "val", "hos", "e","jo",
+    "ken", "re", "cary", "ow", "lo", "aft", "cid", "l", "oh", "ins", "mn",
+    "lon", "kr", "mes", "hans", "par", "id", "rood", "moog", "joe", "zn", "na",
+    "carl", "noh", "ad", "vegas", "howe", "lew", "mil", "sago", "se", "hart",
+    "dos", "rep", "cains", "las", "se", "siva", "pone", "gte", "johns",
+    "glaser", "ted", "hbo", "thanh", "cato", "iso", "dec", "ca", "hew", "faye",
+    "jan", "asp", "hep", "bah", "lea", "zion", "yale", "le" "devin", "bate",
 ])
+
+
+
 
 
 def is_english(word):
@@ -288,5 +309,5 @@ SET_FREQ_LIST = [
 SAMPLE_KEY = ((2, "a"), (1, "t"), (12, "h"), (4, "e"), (8, "o"), (11, "f"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import ipdb; ipdb.set_trace()

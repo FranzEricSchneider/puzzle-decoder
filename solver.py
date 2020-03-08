@@ -32,9 +32,11 @@ def main():
     checked_keys = json.load(open(CHECKED_FILE, "r"))
 
     if args.examine_results:
+        # Get the top N results
         ranked_keys, scores = \
             util.get_ranked_keys(checked_keys, number=args.number_to_examine)
 
+        # And display them in a number of ways
         for key, score in zip(ranked_keys, scores):
             if args.show_words_only:
                 print(util.get_english_words(key))
@@ -43,17 +45,17 @@ def main():
             print("")
 
     else:
-        # And loading the exponential RNG
+        # Load the exponential RNG once
         RNG = util.sample_exponential()
 
-        # key = data.SAMPLE_KEY
-        for _ in range(int(1e3)):
+        # Try a number of times
+        for _ in range(int(1e6)):
             key = util.generate_random_key(RNG, checked_keys, 26)
 
             # Scores the key and adds it to the dictionary checked_keys
             mapped, score = util.check_key(checked_keys, data.WORD_SET, key)
 
-        # Always end by writing the updated list
+        # Always end key production by writing the updated dictionary
         with open(CHECKED_FILE, "w") as file:
             json.dump(checked_keys, file)
 

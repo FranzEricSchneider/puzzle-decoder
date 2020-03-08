@@ -289,19 +289,26 @@ def get_ranked_keys(checked_keys, number=1):
             [key.score for key in ranked_keys])
 
 
-def generate_random_key(RNG, checked_keys, length):
+def generate_random_key(RNG, checked_keys, length, frozen=None):
     """
     Create a random key, sampled from likely letters, of given length.
 
     Arguments:
-        RNG: TODO
+        RNG: Generator that produces a float from 0 to 1, waited towards 0
+            with the exponential distribution. The purpose is to use it to
+            preferentially sample letters on the likely side of the frequency
+            sorted list
         checked_keys: a dictionary of keys and scores, as from
             checked_keys_dictionary.json
         length: int, length of key to create
+        frozen: tuple of tuple pairs (like a key) containing cipher and ascii
+            pairs that we want to force into the key
 
     Returns:
         A key of the normal format, a tuple of tuple pairs containing
-            (cipher character, ascii letter)
+            (cipher character, ascii letter). Should be sorted so that cipher
+            characters are in the same order as data.SET_FREQ_LIST, for key
+            comparability
     """
     key = []
 
@@ -309,6 +316,15 @@ def generate_random_key(RNG, checked_keys, length):
     # elements can be popped
     sample_characters = list(data.SET_FREQ_LIST)
     sample_letters = list(data.ENGLISH_FREQ_LIST)
+
+    # Freeze certain pairs
+    if frozen is not None:
+        for character, letter in frozen:
+            # Add the pair to the key
+            key.append((character, letter))
+            # Remove the pair from the sample lists
+            sample_characters.pop(sample_characters.index(character))
+            sample_letters.pop(sample_letters.index(letter))
 
     # Critically (maybe), for each key we want to map the *first* character
     # with a sampled letter.
@@ -319,7 +335,8 @@ def generate_random_key(RNG, checked_keys, length):
     # Note: We *definitely* don't want to pop the same index from each list,
     #   (that would always be the same mapping but with differently ordered
     #   pairs) but we could take two samples
-    for _, sample in zip(range(length), RNG):
+    while len(key) < length:
+        sample = next(RNG)
         index = int(round(sample * len(sample_letters))) - 1
         key.append(
             (
@@ -331,6 +348,10 @@ def generate_random_key(RNG, checked_keys, length):
         if len(sample_characters) == 0 or len(sample_letters) == 0:
             break
 
+    # Sort it so the cipher characters are in frequency order (for key
+    # comparability)
+    key = sorted(key, key=lambda x: data.SET_FREQ_LIST.index(x[0]))
+
     # Tuplify it to lock it in place and make it dictionaryable
     key = tuple(key)
 
@@ -341,3 +362,7 @@ def generate_random_key(RNG, checked_keys, length):
         key = generate_random_key(RNG, checked_keys, length)
 
     return key
+
+
+def polish_known_key(key):
+    pass

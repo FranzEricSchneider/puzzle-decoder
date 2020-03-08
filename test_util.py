@@ -20,7 +20,7 @@ def main():
     test_check_key()
     test_map_words()
     # test_display_key()
-    test_display_words()
+    # test_display_words()
     test_get_ranked_keys()
     test_generate_random_key()
 
@@ -204,15 +204,56 @@ def test_generate_random_key():
     assert "t" in values
 
     # Make a really common key and make sure we don't hit it
-    checked_keys = {str(((4, 'e'), (16, 't'))): 0.5}
+    checked_keys = {str(((4, "e"), (16, "t"))): 0.5}
     for _ in range(int(1e3)):
         key = util.generate_random_key(RNG, checked_keys, 2)
-        assert key != ((4, 'e'), (16, 't'))
+        assert key != ((4, "e"), (16, "t"))
 
     # Check a longer-than possible length
     key = util.generate_random_key(RNG, {}, 30)
     assert len(key) == len(data.UNKNOWN)
 
+    # Check that we can freeze certain pairs
+    for _ in range(int(1e3)):
+        key = util.generate_random_key(
+            RNG, {}, 4, frozen=((16, "t"), (8, "o"))
+        )
+        # Make sure we have the right 4 pairs
+        assert len(key) == 4
+        key_dict = dict(key)
+        for character in [4, 16, 2, 8]:
+            assert character in key_dict
+        # Check that the frozen pairs always have the right value
+        assert key_dict[16] == "t"
+        assert key_dict[8] == "o"
+        # Check that the generated characters never take the frozen values
+        for new_character in (4, 2):
+            for frozen_value in ("t", "o"):
+                assert key_dict[new_character] != frozen_value
 
-if __name__ == '__main__':
+    # Check that the order of cipher characters always shows up the same. For
+    # key comparison sake, we always want the cipher characters to show up in
+    # the same order as the frequency sorted list. With the frozen pairs, we're
+    # stating that values can be skipped but the order should be the same.
+    # Note that the frozen values can be out of order and the final key should
+    # end up the same.
+    for frozen in (
+                ((16, "t"), (8, "o")),
+                ((8, "o"), (16, "t")),
+                ((14, "g"), (29, "r"), (7, "e"), (1, "y")),
+                ((8, "x"), (7, "c"), (19, "f"), (12, "b"), (11, "w")),
+            ):
+        key = util.generate_random_key(RNG, {}, len(frozen) + 4, frozen=frozen)
+        key_dict = dict(key)
+        sorted_characters = [
+            character for character in data.SET_FREQ_LIST
+            if character in key_dict
+        ]
+        assert [pair[0] for pair in key] == sorted_characters
+
+    # TODO: Make a test where if frozen is too long or duplicates characters
+    # we should raise.
+
+
+if __name__ == "__main__":
     main()
