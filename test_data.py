@@ -19,6 +19,9 @@ def test_english():
     for not_word in ["esmerylda", "waz", "mohst", "upzet", "whith", "nanogg"]:
         assert not data.is_english(not_word)
 
+    for bad_word in data.BLACKLIST:
+        assert not data.is_english(bad_word)
+
 
 def test_character_number():
     """Assert that our unknown characters can be explained by the alphabet."""

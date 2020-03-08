@@ -7,8 +7,17 @@ with open("/usr/share/dict/words") as word_file:
     _english = set(word.strip().lower() for word in word_file)
 
 
+# Words that are in the dictionary that I am removing from consideration
+# (Most of these are populated using the solver's --show-words-only arg)
+BLACKLIST = set([
+    "th", "ob", "li", "pei", "rn", "cali", "ani", "au", "sn", "ts", "os", "rs",
+    "es", "nth", "o", "ti", "lind",
+])
+
+
 def is_english(word):
-    return word.lower() in _english
+    word = word.lower()
+    return word in _english and word not in BLACKLIST
 
 
 ASSUMED = {
