@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from ast import literal_eval
 import collections
 import cv2
 import numpy
@@ -217,7 +218,7 @@ def check_key(checked_keys, words, key):
     return mapped, score
 
 
-def display_key(key, include_characters=False):
+def display_key(key, include_characters=False, score=None):
     """Render a key onto the whole dataset."""
     mapped = list(map_characters(data.CHARACTERS, key))
     for idx in range(len(mapped)):
@@ -235,7 +236,10 @@ def display_key(key, include_characters=False):
         joined = joined.replace(" .", " ").replace(". ", " ")
         joined = joined.replace(" ", "   ")
 
-    return "{}\n".format(key) + joined
+    if score is None:
+        return "{}\n".format(key) + joined
+    else:
+        return "score: {:.4f}\n{}\n".format(score, key) + joined
 
 
 RankedKey = collections.namedtuple('RankedKey', ['key', 'score'])
@@ -265,7 +269,7 @@ def get_ranked_keys(checked_keys, number=1):
                                  key=lambda x: x.score,
                                  reverse=True)
 
-    return ([key.key for key in ranked_keys],
+    return ([literal_eval(key.key) for key in ranked_keys],
             [key.score for key in ranked_keys])
 
 

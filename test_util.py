@@ -153,6 +153,8 @@ def test_display_key():
     print(util.display_key(data.SAMPLE_KEY, include_characters=True))
     print("\n==================\n")
     print(util.display_key(data.SAMPLE_KEY, include_characters=False))
+    print("\n==================\n")
+    print(util.display_key(data.SAMPLE_KEY, include_characters=False, score=1))
 
 
 def test_get_ranked_keys():
