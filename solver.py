@@ -22,6 +22,10 @@ def main():
                         help="Number of results to examine",
                         type=int,
                         default=3)
+    parser.add_argument("-w", "--show-words-only",
+                        help="When examining results, show only the full words"
+                             " that made up the score",
+                        action="store_true")
     args = parser.parse_args()
 
     # Always start by checking the saved keys
@@ -32,7 +36,10 @@ def main():
             util.get_ranked_keys(checked_keys, number=args.number_to_examine)
 
         for key, score in zip(ranked_keys, scores):
-            print(util.display_key(key, score=score))
+            if args.show_words_only:
+                print(util.get_english_words(key))
+            else:
+                print(util.display_key(key, score=score))
             print("")
 
     else:
@@ -40,7 +47,7 @@ def main():
         RNG = util.sample_exponential()
 
         # key = data.SAMPLE_KEY
-        for _ in range(int(1e6)):
+        for _ in range(int(1e3)):
             key = util.generate_random_key(RNG, checked_keys, 26)
 
             # Scores the key and adds it to the dictionary checked_keys

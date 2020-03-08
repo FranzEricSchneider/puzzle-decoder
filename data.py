@@ -276,7 +276,7 @@ SET_FREQ_LIST = [
 
 
 # Example of how keys look (could be up to 26 pairs long)
-SAMPLE_KEY = ((2, "a"), (1, "t"), (12, "h"), (4, "e"), (8, "i"), (11, "s"))
+SAMPLE_KEY = ((2, "a"), (1, "t"), (12, "h"), (4, "e"), (8, "o"), (11, "f"))
 
 
 if __name__ == '__main__':

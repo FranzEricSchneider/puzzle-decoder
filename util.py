@@ -242,6 +242,22 @@ def display_key(key, include_characters=False, score=None):
         return "score: {:.4f}\n{}\n".format(score, key) + joined
 
 
+def get_english_words(key):
+    """Return a set of only the full words that went into the score."""
+    words = set()
+    mapped = map_words(data.WORD_SET, key)
+
+    for word in mapped:
+        try:
+            string_word = "".join(word)
+            if data.is_english(string_word):
+                words.add(string_word)
+        except TypeError:
+            pass
+
+    return words
+
+
 RankedKey = collections.namedtuple('RankedKey', ['key', 'score'])
 
 

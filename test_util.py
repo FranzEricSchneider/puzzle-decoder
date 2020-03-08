@@ -20,6 +20,7 @@ def main():
     test_check_key()
     test_map_words()
     # test_display_key()
+    test_display_words()
     test_get_ranked_keys()
     test_generate_random_key()
 
@@ -157,6 +158,10 @@ def test_display_key():
     print(util.display_key(data.SAMPLE_KEY, include_characters=False, score=1))
 
 
+def test_display_words():
+    print(util.get_english_words(data.SAMPLE_KEY))
+
+
 def test_get_ranked_keys():
     # Pretty simple, make sure we get a sorted list of the right length
     # Note that we want to call str() on a tuple (instead of writing a string)
@@ -169,13 +174,13 @@ def test_get_ranked_keys():
         str(((4, 'a'), (9, 'z'))): 0.0,
     }
     ranked_keys, scores = util.get_ranked_keys(checked_keys)
-    assert ranked_keys == [str(((1, 'a'), (5, 'z')))]
+    assert ranked_keys == [((1, 'a'), (5, 'z'))]
     assert scores == [0.75]
 
     ranked_keys, scores = util.get_ranked_keys(checked_keys, number=3)
-    assert ranked_keys == [str(((1, 'a'), (5, 'z'))),
-                           str(((2, 'a'), (4, 'z'))),
-                           str(((3, 'a'), (6, 'z')))]
+    assert ranked_keys == [((1, 'a'), (5, 'z')),
+                           ((2, 'a'), (4, 'z')),
+                           ((3, 'a'), (6, 'z'))]
     assert scores == [0.75, 0.5, 0.15]
 
 
