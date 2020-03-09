@@ -36,7 +36,8 @@ BLACKLIST = set([
 
 # Words not in English but known part of the solution
 KNOWN_GOOD = set([
-    "illithid", "askelios", "areksul", "aundaire", "fairhaven",
+    "illithid", "askelios", "areksul", "aundaire", "goblinoids", "agression",
+    "choas"
 ])
 
 

@@ -10,3 +10,5 @@ Thoughts about working on a simple substitution cipher.
 * The score was based purely on number of English words. Scoring longer words higher would likely be good, because explaining a longer word is harder. Maybe score by portion of text explained?
 * Likewise, oftentimes there'd be unusual words (unlikely to be the solution) that scored just as highly as common words because they were both ruled to be real. How about altering the scoring by some commonality metric?
 * If a commonality metric is included, there should be a mechanism to choose some expected words by hand that aren't necessarily common in English but you may expect to show up.
+* For speed reasons we should, once we're past the midpoint, clear out all of the really low scoring keys and just focus on polishing the top performers
+* A really useful thing a human can do right now is knock out solutions that are English but have gotten locked in. For example, "ok" or "ox" gets locked in instead of "of", "pith" gets locked in instead of "with", and "par" gets locked in instead of "war". To further automate things, something that occasionally knocks out letters would be useful

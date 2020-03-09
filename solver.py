@@ -18,21 +18,28 @@ def main():
         description="Make new keys and examine the solve state",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
+    parser.add_argument("-b", "--polish-best",
+                        help="Polish the best 10 results",
+                        action="store_true")
     parser.add_argument("-e", "--examine-results",
                         help="Examine the top N results",
                         action="store_true")
     parser.add_argument("-i", "--ipdb",
                         help="Open ipdb at end of script",
                         action="store_true")
+    parser.add_argument("-N", "--number-to-random-solve",
+                        help="# random keys to generate (default action)",
+                        type=int,
+                        default=int(1e4))
+    parser.add_argument("-n", "--number-to-examine",
+                        help="Number of results to examine",
+                        type=int,
+                        default=3)
     parser.add_argument("-o", "--output-best-guess",
                         help="Write out image of best guess",
                         action="store_true")
     parser.add_argument("-p", "--polish-key",
                         help="Pass in a key and we'll try to improve it")
-    parser.add_argument("-n", "--number-to-examine",
-                        help="Number of results to examine",
-                        type=int,
-                        default=3)
     parser.add_argument("-w", "--show-words-only",
                         help="When examining results, show only the full words"
                              " that made up the score",
@@ -70,9 +77,19 @@ def main():
                                   words=data.WORD_SET,
                                   key=literal_eval(args.polish_key))
 
+        elif args.polish_best:
+            ranked_keys, scores = \
+                util.get_ranked_keys(checked_keys, number=10)
+
+            for key in ranked_keys:
+                util.polish_known_key(RNG=RNG,
+                                      checked_keys=checked_keys,
+                                      words=data.WORD_SET,
+                                      key=key)
+
         else:
             # Try a number of times
-            for _ in range(int(1e4)):
+            for _ in range(args.number_to_random_solve):
                 key = util.generate_random_key(RNG, checked_keys, 26)
 
                 # Scores the key and adds it to the dictionary checked_keys
